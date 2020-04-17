@@ -78,6 +78,8 @@ beavfree(void *ptr)
 void 
 beavalloc_reset(void)
 {
+    brk(lower_mem_bound);
+
 }
 
 void *
