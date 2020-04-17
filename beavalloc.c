@@ -52,7 +52,19 @@ void *
 beavalloc(size_t size)
 {
     void *ptr = NULL;
-    void *putintothisblock(*mem_block_t);
+    void putintothisblock(mem_block_t *block){
+	mem_block_t *newblock = block + BLOCK_SIZE + block->size;
+	newblock->capacity = block->capacity - block->size - BLOCK_SIZE;
+	newblock->size = size;
+	newblock->prev = block;
+	newblock->next = block->next;
+	if(newblock->next != NULL){
+		newblock->next->prev = newblock;
+	}
+	block->next = newblock;
+	ptr = (void *)newblock + BLOCK_SIZE;	
+		
+    }
     if(block_list_head == NULL){
 	int increase_max_value = (((size + BLOCK_SIZE)/1024) + 1) * 1024;
         lower_mem_bound = sbrk(0);
@@ -65,6 +77,7 @@ beavalloc(size_t size)
 	block_list_head->next = NULL;
 	block_list_head->prev = NULL;
 	ptr = lower_mem_bound + BLOCK_SIZE;
+	
     }else{
         mem_block_t* current = block_list_head;
 	if(current->capacity - current->size >= size){
