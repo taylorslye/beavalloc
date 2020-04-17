@@ -63,6 +63,7 @@ beavalloc(size_t size)
 	block_list_head->capacity = (increase_max_value - BLOCK_SIZE) - size;
 	block_list_head->next = NULL;
 	block_list_head->prev = NULL;
+	ptr = lower_mem_bound + BLOCK_SIZE;
     }
     return ptr;
 }
