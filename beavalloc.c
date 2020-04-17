@@ -52,6 +52,7 @@ void *
 beavalloc(size_t size)
 {
     void *ptr = NULL;
+    void *putintothisblock(*mem_block_t);
     if(block_list_head == NULL){
 	int increase_max_value = (((size + BLOCK_SIZE)/1024) + 1) * 1024;
         lower_mem_bound = sbrk(0);
@@ -59,11 +60,26 @@ beavalloc(size_t size)
 	upper_mem_bound = lower_mem_bound + increase_max_value;
 	block_list_head  = lower_mem_bound;	
 	block_list_head->free = 0;
-	block_list_head->size = increase_max_value - BLOCK_SIZE;
-	block_list_head->capacity = (increase_max_value - BLOCK_SIZE) - size;
+	block_list_head->size = size;
+	block_list_head->capacity = (increase_max_value - BLOCK_SIZE);
 	block_list_head->next = NULL;
 	block_list_head->prev = NULL;
 	ptr = lower_mem_bound + BLOCK_SIZE;
+    }else{
+        mem_block_t* current = block_list_head;
+	if(current->capacity - current->size >= size){
+	    putintothisblock(current);	
+	}else{
+	    while(current->next != NULL){
+                current = current->next;
+	        if(current->capacity - current->size >= size){
+		    putintothisblock(current);
+		    break;
+		}
+            }
+        }
+
+	//need to put adding more sbrk here to fit more memory
     }
     return ptr;
 }
@@ -71,6 +87,8 @@ beavalloc(size_t size)
 void 
 beavfree(void *ptr)
 {
+    mem_block_t* free_block = (mem_block_t*) ptr;
+    free_block->free = 1;
     return;
 }
 
